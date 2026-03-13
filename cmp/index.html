@@ -4,33 +4,34 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CMP | A4P</title>
-<link rel="stylesheet" href="../styles.css" />
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--text:#1f2937;--muted:#5b6472;--primary:#1e3a5f;--primary-2:#294d7a;--border:#e6ebf2;--shadow:0 18px 42px rgba(15,23,42,.10);--radius:16px}
+*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);padding:24px}
+.wrap{max-width:980px;margin:0 auto;background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:34px 28px 42px}
+.top{text-align:center;margin-bottom:26px}.logo{max-width:220px;width:100%;height:auto;margin:0 auto 12px;display:block;border-radius:12px}
+.badge{display:inline-block;font-size:13px;background:#eef3f9;color:var(--primary);border:1px solid #dbe6f3;padding:7px 12px;border-radius:999px;margin-bottom:14px;font-weight:700;letter-spacing:.2px}
+h1{margin:0 0 10px;font-size:36px;line-height:1.12;color:var(--primary)}.subtitle{margin:0 auto;max-width:900px;font-size:18px;line-height:1.6;color:var(--muted)}
+.actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}.btn{display:inline-block;text-decoration:none;background:var(--primary);color:#fff;padding:16px 22px;border-radius:12px;font-weight:700;text-align:center;border:1px solid transparent}.btn:hover{background:var(--primary-2)}.btn.secondary{background:#fff;color:var(--primary);border-color:#c9d8ea}
+.card{border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(180deg,#fff 0%,#f9fbfe 100%);padding:24px;margin-top:24px}.notice{margin:18px 0;color:var(--muted);line-height:1.7;font-size:17px}
+@media (max-width:680px){.wrap{padding:24px 18px 30px}.actions .btn{width:100%}.wrap h1{font-size:30px}}
+</style>
 </head>
 <body>
-<main class="page">
-  <section class="shell hero">
-    <img class="hero-logo" src="../assets/logo-a4p.png" alt="A4P">
-    <div class="hero-content">
-      <div class="eyebrow">Module 2 • A4P</div>
-      <h1>Compétences Mentales (CMP)</h1>
-      <p class="lead">Page d’entrée stabilisée du module CMP. Tes clients accèdent ici au CMP actif, puis reviennent vers le hub principal.</p>
-      <div class="toolbar">
-        <a class="btn" href="https://alexandregriffet-cmd.github.io/CMP-A4P-ACADEMIE-DE-PERFORMANCES-/">Ouvrir le test CMP actif</a>
-        <a class="btn secondary" href="../index.html">Retour au hub</a>
-        <a class="btn secondary" href="https://alexandregriffet-cmd.github.io/CMP-A4P-ACADEMIE-DE-PERFORMANCES-/resultats.html">Ouvrir la synthèse</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="card" style="margin-top:22px">
-    <div class="eyebrow">Mode d’utilisation</div>
-    <h2 style="margin:0 0 12px;color:#12284c;font-size:34px">Passerelle stable Hub ↔ CMP</h2>
-    <div class="module-meta">
-      <div><strong>CMP ouvert :</strong> CMP-A4P-ACADEMIE-DE-PERFORMANCES-</div>
-      <div><strong>Retour :</strong> ../index.html</div>
-      <div><strong>Stockage partagé :</strong> localStorage["a4p_hub_results"]</div>
-    </div>
-  </section>
-</main>
+<div class="wrap">
+  <div class="top">
+    <img class="logo" src="../assets/logo-a4p.jpeg" alt="A4P">
+    <div class="badge">Module 2 • A4P</div>
+    <h1>Compétences Mentales (CMP)</h1>
+    <p class="subtitle">Page passerelle stabilisée vers le vrai CMP actif.</p>
+  </div>
+  <div class="actions">
+    <a class="btn" href="https://alexandregriffet-cmd.github.io/CMP-A4P-ACADEMIE-DE-PERFORMANCES-/">Ouvrir le test CMP actif</a>
+    <a class="btn secondary" href="../index.html">Retour au hub</a>
+    <a class="btn secondary" href="https://alexandregriffet-cmd.github.io/CMP-A4P-ACADEMIE-DE-PERFORMANCES-/resultats.html">Ouvrir la synthèse</a>
+  </div>
+  <div class="card">
+    <p class="notice">Depuis cette page, le client est redirigé vers le CMP A4P réellement utilisé et synchronisé avec le hub. Le bouton principal ouvre directement le test. Le bouton synthèse ouvre directement les résultats du CMP actif.</p>
+  </div>
+</div>
 </body>
 </html>
