@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CMP | A4P</title>
+<style>
+:root{
+  --bg:#f4f6f9; --card:#fff; --text:#1f2937; --muted:#5b6472;
+  --primary:#1e3a5f; --primary-2:#294d7a; --border:#e6ebf2;
+  --shadow:0 18px 42px rgba(15,23,42,.10); --radius:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);padding:24px}
+.wrap{max-width:1180px;margin:0 auto;background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:34px 28px 42px}
+.top{text-align:center;margin-bottom:26px}
+.logo{max-width:220px;width:100%;height:auto;margin:0 auto 12px;display:block;border-radius:12px}
+.badge{display:inline-block;font-size:13px;background:#eef3f9;color:var(--primary);border:1px solid #dbe6f3;padding:7px 12px;border-radius:999px;margin-bottom:14px;font-weight:700;letter-spacing:.2px}
+h1{margin:0 0 10px;font-size:36px;line-height:1.12;color:var(--primary)}
+h2{margin:0 0 10px;color:var(--primary)}
+.subtitle{margin:0 auto;max-width:900px;font-size:18px;line-height:1.6;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:32px}
+.card{border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(180deg,#fff 0%,#f9fbfe 100%);padding:24px}
+.module{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#6b7280;font-weight:700;margin-bottom:8px}
+.meta{margin:0 0 18px;padding-left:18px;color:var(--text);line-height:1.7;font-size:14px}
+.btn{display:inline-block;text-decoration:none;background:var(--primary);color:#fff;padding:13px 18px;border-radius:10px;font-weight:700;text-align:center;border:1px solid transparent}
+.btn:hover{background:var(--primary-2)}
+.btn.secondary{background:#fff;color:var(--primary);border-color:#c9d8ea}
+.actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.synthese{margin-top:30px;border-top:1px solid var(--border);padding-top:28px;text-align:center}
+.footer{margin-top:28px;text-align:center;font-size:13px;color:#6b7280}
+.frame-wrap{margin-top:20px;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#fff}
+iframe{width:100%;height:78vh;border:0;background:#fff}
+.notice{margin:18px 0;color:var(--muted);line-height:1.6}
+.kv{display:grid;grid-template-columns:1.1fr 2fr;gap:10px;margin:8px 0}
+.kv strong{color:var(--primary)}
+@media (max-width:980px){.grid{grid-template-columns:1fr}h1{font-size:30px}.wrap{padding:24px 18px 30px}.kv{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <img class="logo" src="../assets/logo-a4p.jpeg" alt="A4P">
+    <div class="badge">Module 2 • A4P</div>
+    <h1>Compétences Mentales (CMP)</h1>
+    <p class="subtitle">Page d’intégration propre du module CMP dans l’environnement A4P.</p>
+  </div>
+
+  <div class="actions">
+    <a class="btn" href="https://alexandregriffet-cmd.github.io/CMP_academie_performances.html/">Ouvrir le test CMP actif</a>
+    <a class="btn secondary" href="../index.html">Retour au hub</a>
+    <a class="btn secondary" href="../synthese.html">Ouvrir la synthèse</a>
+  </div>
+
+  <div class="card" style="margin-top:22px">
+    <h2>Mode d’utilisation</h2>
+    <p class="notice">
+      Cette page sert de point d’entrée propre dans un dépôt GitHub unique. Le test actif s’ouvre via le lien principal.
+      Quand tu auras une version CMP autonome complète, il suffira de remplacer ce fichier par le vrai moteur local.
+    </p>
+    <div class="kv"><strong>État actuel</strong><span>Passerelle stable vers le test CMP actif</span></div>
+    <div class="kv"><strong>Étape future</strong><span>Remplacer par un CMP local complet dans ce dossier</span></div>
+    <div class="kv"><strong>Intérêt</strong><span>Un seul hub, une seule arborescence, aucune confusion dans le dépôt</span></div>
+  </div>
+</div>
+</body>
+</html>
