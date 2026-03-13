@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Synthèse A4P</title>
+<style>
+:root{
+  --bg:#f4f6f9; --card:#fff; --text:#1f2937; --muted:#5b6472;
+  --primary:#1e3a5f; --primary-2:#294d7a; --border:#e6ebf2;
+  --shadow:0 18px 42px rgba(15,23,42,.10); --radius:16px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);padding:24px}
+.wrap{max-width:1180px;margin:0 auto;background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:34px 28px 42px}
+.top{text-align:center;margin-bottom:26px}
+.logo{max-width:220px;width:100%;height:auto;margin:0 auto 12px;display:block;border-radius:12px}
+.badge{display:inline-block;font-size:13px;background:#eef3f9;color:var(--primary);border:1px solid #dbe6f3;padding:7px 12px;border-radius:999px;margin-bottom:14px;font-weight:700;letter-spacing:.2px}
+h1{margin:0 0 10px;font-size:36px;line-height:1.12;color:var(--primary)}
+h2{margin:0 0 10px;color:var(--primary)}
+.subtitle{margin:0 auto;max-width:900px;font-size:18px;line-height:1.6;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin-top:32px}
+.card{border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(180deg,#fff 0%,#f9fbfe 100%);padding:24px}
+.module{font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:#6b7280;font-weight:700;margin-bottom:8px}
+.meta{margin:0 0 18px;padding-left:18px;color:var(--text);line-height:1.7;font-size:14px}
+.btn{display:inline-block;text-decoration:none;background:var(--primary);color:#fff;padding:13px 18px;border-radius:10px;font-weight:700;text-align:center;border:1px solid transparent}
+.btn:hover{background:var(--primary-2)}
+.btn.secondary{background:#fff;color:var(--primary);border-color:#c9d8ea}
+.actions{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.synthese{margin-top:30px;border-top:1px solid var(--border);padding-top:28px;text-align:center}
+.footer{margin-top:28px;text-align:center;font-size:13px;color:#6b7280}
+.frame-wrap{margin-top:20px;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#fff}
+iframe{width:100%;height:78vh;border:0;background:#fff}
+.notice{margin:18px 0;color:var(--muted);line-height:1.6}
+.kv{display:grid;grid-template-columns:1.1fr 2fr;gap:10px;margin:8px 0}
+.kv strong{color:var(--primary)}
+@media (max-width:980px){.grid{grid-template-columns:1fr}h1{font-size:30px}.wrap{padding:24px 18px 30px}.kv{grid-template-columns:1fr}}
+
+.scorebox{border:1px solid var(--border);border-radius:14px;padding:16px;background:#fbfdff}
+.small{font-size:14px;color:var(--muted)}
+.value{font-size:26px;color:var(--primary);font-weight:800;margin:6px 0 10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <img class="logo" src="assets/logo-a4p.jpeg" alt="A4P">
+    <div class="badge">Synthèse globale • A4P</div>
+    <h1>Cartographie mentale A4P</h1>
+    <p class="subtitle">Lecture croisée du hub A4P à partir des informations enregistrées dans le navigateur.</p>
+  </div>
+
+  <div class="actions" style="margin-bottom:22px">
+    <a class="btn secondary" href="index.html">Retour au hub</a>
+    <button class="btn" onclick="location.reload()">Actualiser la synthèse</button>
+  </div>
+
+  <div class="grid">
+    <section class="scorebox">
+      <div class="small">Module 1</div>
+      <div class="value" id="pmpProfile">Aucune donnée</div>
+      <div class="small" id="pmpMeta">Complète le PMP pour alimenter cette zone.</div>
+    </section>
+    <section class="scorebox">
+      <div class="small">Module 2</div>
+      <div class="value" id="cmpProfile">Aucune donnée</div>
+      <div class="small">Le CMP sera pleinement croisé quand son moteur local enregistrera ses résultats.</div>
+    </section>
+    <section class="scorebox">
+      <div class="small">Module 3</div>
+      <div class="value" id="psyProfile">Aucune donnée</div>
+      <div class="small">Le psycho-émotionnel sera pleinement croisé quand son moteur local enregistrera ses résultats.</div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:22px">
+    <h2>Lecture actuelle</h2>
+    <p class="notice" id="globalText">
+      Cette synthèse lit déjà les données PMP disponibles dans le navigateur. Elle est prête à accueillir ensuite
+      les sorties CMP et psycho dans cette même architecture propre.
+    </p>
+  </section>
+
+  <section class="card" style="margin-top:22px">
+    <h2>Ce que contient ce pack</h2>
+    <div class="kv"><strong>Hub</strong><span>index.html</span></div>
+    <div class="kv"><strong>Synthèse</strong><span>synthese.html</span></div>
+    <div class="kv"><strong>PMP</strong><span>pmp/index.html local</span></div>
+    <div class="kv"><strong>CMP</strong><span>cmp/index.html point d’entrée propre</span></div>
+    <div class="kv"><strong>Psycho</strong><span>psycho/index.html point d’entrée propre</span></div>
+  </section>
+</div>
+
+<script>
+(function() {
+  const pmpProfile = localStorage.getItem('a4p_pmp_profile');
+  const pmpMbti = localStorage.getItem('a4p_pmp_mbti');
+  const pmpAction = localStorage.getItem('a4p_pmp_action_code');
+  if (pmpProfile) {
+    document.getElementById('pmpProfile').textContent = pmpProfile;
+    document.getElementById('pmpMeta').textContent =
+      'Type cognitif : ' + (pmpMbti || 'non renseigné') + ' • Préférence motrice : ' + (pmpAction || 'non renseignée');
+    document.getElementById('globalText').textContent =
+      'Le PMP remonte déjà une lecture exploitable dans cette synthèse. Les modules CMP et psycho seront ajoutés à la même logique dès que leurs versions locales complètes seront intégrées.';
+  }
+})();
+</script>
+</body>
+</html>
