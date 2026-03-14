@@ -3,86 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hub Diagnostic A4P</title>
-  <link rel="stylesheet" href="styles.css" />
+  <title>Diagnostic mental A4P</title>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
   <main class="page">
-    <section class="card">
-      <img class="hero-logo" src="assets/logo-a4p.jpeg" alt="Académie de Performances A4P" />
-      <p class="eyebrow">Hub Diagnostic A4P</p>
-      <h1>Plateforme de diagnostic mental</h1>
-      <p class="lead">Navigation SaaS propre PMP / CMP / Équilibre avec synthèse globale, radar combiné et structure club prête pour la suite.</p>
-      <div class="actions">
-        <button class="btn" id="btn-refresh" type="button">Actualiser les données</button>
-        <button class="btn btn-secondary" id="btn-reset" type="button">Réinitialiser le hub</button>
+    <section class="hero">
+      <img class="hero-logo" src="./assets/logo-a4p.jpeg" alt="Académie de Performances A4P" />
+      <div class="hero-body">
+        <p class="eyebrow">Hub diagnostic A4P</p>
+        <h1>Plateforme de diagnostic mental</h1>
+        <p class="lead">Navigation propre PMP / CMP / Équilibre avec synthèse globale, radar combiné et structure club prête pour la suite.</p>
+        <div class="actions">
+          <a id="btn-refresh" class="btn btn-primary" href="#">Actualiser les données</a>
+          <a id="btn-reset" class="btn btn-secondary" href="#">Réinitialiser le hub</a>
+        </div>
       </div>
     </section>
 
-    <section class="grid two">
-      <section class="card">
-        <p class="eyebrow">A4P • Vue d'ensemble</p>
-        <h2>Score global mental</h2>
-        <div class="score" id="score-global">0/100</div>
-        <div class="muted" id="synced-count">0/3 modules synchronisés</div>
-      </section>
-
-      <section class="card">
-        <p class="eyebrow">Radar combiné</p>
-        <div class="radar-wrap">
-          <svg id="radar-svg" class="radar" viewBox="0 0 520 520" aria-label="Radar global"></svg>
-        </div>
-      </section>
-    </section>
-
-    <section class="grid modules">
-      <section class="card module-card">
-        <p class="eyebrow">Module 1</p>
-        <h3>Profil Mental (PMP)</h3>
-        <div><span class="status wait">En attente</span></div>
-        <div class="module-meta"><strong>Profil :</strong> Aucun résultat<br><strong>Score :</strong> —</div>
-        <p>Emplacement stabilisé pour le futur module PMP connecté au hub.</p>
-        <div class="actions"><a class="btn" href="pmp/">Préparer le module PMP</a></div>
-      </section>
-
-      <section class="card module-card">
-        <p class="eyebrow">Module 2</p>
-        <h3>Compétences Mentales (CMP)</h3>
-        <div id="cmp-status"><span class="status wait">En attente</span></div>
-        <div class="module-meta"><strong>Profil :</strong> <span id="cmp-profil">Aucun résultat</span><br><strong>Score :</strong> <span id="cmp-score">—</span></div>
-        <p id="cmp-summary">Le module CMP n’est pas encore synchronisé.</p>
-        <div class="actions">
-          <a class="btn" id="btn-open-cmp" href="#">Ouvrir le test CMP</a>
-          <a class="btn btn-secondary" id="btn-open-cmp-result" href="#">Voir la synthèse</a>
-        </div>
-      </section>
-
-      <section class="card module-card">
-        <p class="eyebrow">Module 3</p>
-        <h3>Équilibre Psycho-Émotionnel</h3>
-        <div><span class="status wait">En attente</span></div>
-        <div class="module-meta"><strong>Profil :</strong> Aucun résultat<br><strong>Score :</strong> —</div>
-        <p>Emplacement stabilisé pour le futur module Équilibre connecté au hub.</p>
-        <div class="actions"><a class="btn" href="psycho/">Préparer le module Équilibre</a></div>
-      </section>
+    <section class="card kpi">
+      <p class="eyebrow">A4P • Vue d’ensemble</p>
+      <div id="global-score" class="kpi-value">0/100</div>
+      <div id="global-count" class="kpi-sub">0/3 modules synchronisés</div>
     </section>
 
     <section class="card">
+      <p class="eyebrow">Radar combiné</p>
+      <div class="canvas-wrap"><canvas id="radarCanvas"></canvas></div>
+    </section>
+
+    <section class="module-grid">
+      <article id="module-pmp" class="card">
+        <div class="module-label">Module 1</div>
+        <div class="module-title">Profil Mental (PMP)</div>
+        <div class="status status-wait">En attente</div>
+        <p class="meta"><strong>Profil :</strong> <span class="profil">Aucun résultat</span><br><strong>Score :</strong> <span class="score">—</span></p>
+        <p class="resume">Le module PMP a été remis sur sa passerelle locale pour éviter toute régression de lien.</p>
+        <div class="actions">
+          <a id="btn-pmp-test" class="btn btn-primary" href="./pmp/index.html">Ouvrir le module PMP</a>
+          <a id="btn-pmp-result" class="btn btn-secondary" href="./pmp/index.html">Voir la synthèse</a>
+        </div>
+      </article>
+
+      <article id="module-cmp" class="card">
+        <div class="module-label">Module 2</div>
+        <div class="module-title">Compétences Mentales (CMP)</div>
+        <div class="status status-wait">En attente</div>
+        <p class="meta"><strong>Profil :</strong> <span class="profil">Aucun résultat</span><br><strong>Score :</strong> <span class="score">—</span></p>
+        <p class="resume">Le hub doit ouvrir le nouveau CMP A4P, pas l’ancienne configuration.</p>
+        <div class="actions">
+          <a id="btn-cmp-test" class="btn btn-primary" href="https://alexandregriffet-cmd.github.io/CMP-A4P-ACADEMIE-DE-PERFORMANCES-/index.html">Ouvrir le test CMP</a>
+          <a id="btn-cmp-result" class="btn btn-secondary" href="https://alexandregriffet-cmd.github.io/CMP-A4P-ACADEMIE-DE-PERFORMANCES-/resultats.html">Voir la synthèse</a>
+        </div>
+      </article>
+
+      <article id="module-equ" class="card">
+        <div class="module-label">Module 3</div>
+        <div class="module-title">Équilibre Psycho-Émotionnel</div>
+        <div class="status status-wait">En attente</div>
+        <p class="meta"><strong>Profil :</strong> <span class="profil">Aucun résultat</span><br><strong>Score :</strong> <span class="score">—</span></p>
+        <p class="resume">Le module Équilibre n’est pas encore connecté.</p>
+        <div class="actions">
+          <a id="btn-equ-test" class="btn btn-primary" href="./psycho/index.html">Ouvrir le module Équilibre</a>
+          <a id="btn-equ-result" class="btn btn-secondary" href="./psycho/index.html">Voir la synthèse</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="card dashboard">
       <p class="eyebrow">Dashboard club</p>
       <h2>Préconfiguration SaaS club</h2>
-      <p class="lead">Cette zone est stabilisée pour accueillir ensuite les scores moyens d’équipe, les profils dominants et les alertes collectives par club.</p>
-      <div class="module-meta"><strong>Joueurs testés :</strong> En attente de base centralisée<br><strong>Score mental moyen :</strong> En attente<br><strong>Ressource clé :</strong> À calculer quand PMP et Équilibre seront branchés</div>
+      <p>Cette zone est stabilisée pour accueillir ensuite les scores moyens d’équipe, les profils dominants et les alertes collectives par club.</p>
+      <p><strong>Joueurs testés :</strong> En attente de base centralisée<br>
+      <strong>Score mental moyen :</strong> En attente<br>
+      <strong>Ressource clé :</strong> À calculer quand PMP et Équilibre seront branchés</p>
     </section>
 
     <section class="card">
       <p class="eyebrow">Données techniques</p>
       <h2>JSON partagé du hub</h2>
-      <pre class="json-box" id="json-output">{}</pre>
-      <p class="footer-note">Hub stabilisé pour pointer vers le CMP actif : https://alexandregriffet-cmd.github.io/CMP-A4P-ACADEMIE-DE-PERFORMANCES-/</p>
+      <details>
+        <summary>Afficher les données</summary>
+        <pre id="shared-json">{}</pre>
+      </details>
     </section>
   </main>
-
-  <script src="js/config.js"></script>
-  <script src="js/hub.js"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/hub.js"></script>
 </body>
 </html>

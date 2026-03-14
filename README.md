@@ -1,14 +1,20 @@
-# Correctif Hub A4P → CMP direct
+# Correctif final Hub A4P
 
-Remplace les fichiers du dépôt `Diagnostic-mental-A4P-` par ceux de ce pack.
+Ce pack corrige trois points immédiatement :
 
-## Fichiers à remplacer
-- `index.html`
-- `cmp/index.html`
-- `js/config.js`
+1. Le bouton CMP du hub ouvre bien le **nouveau CMP A4P** :
+   https://alexandregriffet-cmd.github.io/CMP-A4P-ACADEMIE-DE-PERFORMANCES-/index.html
+2. Le bouton "Voir la synthèse" du CMP ouvre bien :
+   https://alexandregriffet-cmd.github.io/CMP-A4P-ACADEMIE-DE-PERFORMANCES-/resultats.html
+3. Le lien PMP ne casse plus : il revient sur une passerelle locale stable tant que l'URL finale du PMP n'est pas fournie.
 
-## Effet
-- Depuis la carte CMP du hub, le bouton principal ouvre **directement** le vrai CMP actif :
-  `https://alexandregriffet-cmd.github.io/CMP-A4P-ACADEMIE-DE-PERFORMANCES-/`
-- La page `cmp/index.html` reste une passerelle propre avec le même lien direct.
-- Le bouton retour du module CMP revient au hub : `../index.html`
+## Fichiers à remplacer dans le dépôt `Diagnostic-mental-A4P-`
+- index.html
+- styles.css
+- js/config.js
+- js/hub.js
+- cmp/index.html
+- pmp/index.html
+
+## Important
+Le bloc JSON technique a été rangé dans un panneau repliable pour éviter l'affichage brut en bas de page.
