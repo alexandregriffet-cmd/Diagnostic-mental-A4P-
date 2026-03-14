@@ -1,181 +1,85 @@
-function getHubStore() {
-  try {
-    return JSON.parse(localStorage.getItem(window.A4P_CONFIG.hubStorageKey)) || {};
-  } catch (e) {
-    return {};
+(function(){
+  const cfg = window.A4P_CONFIG;
+
+  function getData(){
+    try { return JSON.parse(localStorage.getItem('a4p_hub_results')) || {}; }
+    catch(e){ return {}; }
   }
-}
 
-function resetHubStore() {
-  localStorage.removeItem(window.A4P_CONFIG.hubStorageKey);
-  renderHub();
-}
+  function setText(id, value){ const el=document.getElementById(id); if(el) el.textContent=value; }
+  function setHTML(id, value){ const el=document.getElementById(id); if(el) el.innerHTML=value; }
 
-function safeScore(v) {
-  return typeof v === 'number' && !Number.isNaN(v) ? v : null;
-}
+  function renderRadar(dimensions){
+    const svg = document.getElementById('radar-svg');
+    if(!svg) return;
+    const labels = ['Confiance','Régulation','Engagement','Stabilité'];
+    const keys = ['confiance','regulation','engagement','stabilite'];
+    const values = keys.map(k => Number(dimensions?.[k] || 0));
+    const cx=260, cy=260, r=185;
+    const pts = values.map((v,i)=>{
+      const ang = (-90 + i*90) * Math.PI/180;
+      const rr = r*(v/100);
+      return [cx + Math.cos(ang)*rr, cy + Math.sin(ang)*rr];
+    });
+    const polygon = pts.map(p=>p.join(',')).join(' ');
 
-function computeGlobalMentalScore(data) {
-  const scores = [safeScore(data?.CMP?.score_global), safeScore(data?.PMP?.score_global), safeScore(data?.EQU?.score_global)].filter(v => v !== null);
-  if (!scores.length) return null;
-  return Math.round(scores.reduce((a,b)=>a+b,0) / scores.length);
-}
+    let grid='';
+    [20,40,60,80,100].forEach(level=>{
+      const rr=r*(level/100);
+      const levelPts = [0,1,2,3].map(i=>{
+        const ang=(-90+i*90)*Math.PI/180;
+        return [cx+Math.cos(ang)*rr, cy+Math.sin(ang)*rr].join(',');
+      }).join(' ');
+      grid += `<polygon points="${levelPts}" fill="none" stroke="#cfd8e8" stroke-width="2"/>`;
+    });
+    const axes = [0,1,2,3].map(i=>{
+      const ang=(-90+i*90)*Math.PI/180;
+      return `<line x1="${cx}" y1="${cy}" x2="${cx+Math.cos(ang)*r}" y2="${cy+Math.sin(ang)*r}" stroke="#cfd8e8" stroke-width="2"/>`;
+    }).join('');
+    const labelPts = [0,1,2,3].map(i=>{
+      const ang=(-90+i*90)*Math.PI/180;
+      const lr=r+48;
+      return {x:cx+Math.cos(ang)*lr, y:cy+Math.sin(ang)*lr, t:labels[i]};
+    });
+    const texts = labelPts.map(l=>`<text x="${l.x}" y="${l.y}" text-anchor="middle" dominant-baseline="middle" font-size="22" font-weight="700" fill="#264879">${l.t}</text>`).join('');
+    const dots = pts.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="7" fill="#264879"/>`).join('');
+    svg.innerHTML = `${grid}${axes}<polygon points="${polygon}" fill="rgba(38,72,121,.18)" stroke="#264879" stroke-width="5"/>${dots}${texts}`;
+  }
 
-function moduleStatus(data, key) {
-  return Boolean(data && data[key]);
-}
+  function render(){
+    const data = getData();
+    const cmp = data.CMP;
+    const syncedCount = [data.PMP, data.CMP, data.EQU].filter(Boolean).length;
+    const global = cmp?.score_global || 0;
+    setText('score-global', `${global}/100`);
+    setText('synced-count', `${syncedCount}/3 modules synchronisés`);
 
-function renderModuleCard(rootId, options) {
-  const root = document.getElementById(rootId);
-  if (!root) return;
-  const data = getHubStore();
-  const result = data[options.key];
-  const ready = Boolean(result);
-  const score = safeScore(result?.score_global);
-  const summary = result?.summary || result?.resume_court || options.emptyText;
-  const profile = result?.profil_nom || result?.profil || 'Aucun résultat';
-  root.innerHTML = `
-    <div class="module-tag">${options.moduleLabel}</div>
-    <h3>${options.title}</h3>
-    <p class="module-desc">${options.description}</p>
-    <div class="status ${ready ? 'ready' : 'pending'}">${ready ? 'Synchronisé' : 'En attente'}</div>
-    <div class="module-meta">
-      <div><strong>Profil :</strong> ${profile}</div>
-      <div><strong>Score :</strong> ${score !== null ? score + '/100' : '—'}</div>
-    </div>
-    <p class="summary">${summary}</p>
-    <div class="card-actions">
-      <a class="btn" href="${options.launchUrl}">${options.launchLabel}</a>
-      ${options.resultsUrl ? `<a class="btn secondary" href="${options.resultsUrl}">Voir la synthèse</a>` : ''}
-    </div>
-  `;
-}
+    renderRadar(cmp?.dimensions || {});
 
-function drawRadar(canvasId, data) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  const cssSize = Math.min(canvas.parentElement.clientWidth, 420);
-  canvas.width = cssSize * dpr;
-  canvas.height = cssSize * dpr;
-  canvas.style.width = cssSize + 'px';
-  canvas.style.height = cssSize + 'px';
-  ctx.scale(dpr, dpr);
-  const size = cssSize;
-  const cx = size / 2;
-  const cy = size / 2;
-  const r = size * 0.34;
-  const labels = ['Confiance','Régulation','Engagement','Stabilité'];
-  const values = [
-    safeScore(data?.CMP?.dimensions?.confiance),
-    safeScore(data?.CMP?.dimensions?.regulation),
-    safeScore(data?.CMP?.dimensions?.engagement),
-    safeScore(data?.CMP?.dimensions?.stabilite)
-  ].map(v => v === null ? 0 : v);
-  ctx.clearRect(0, 0, size, size);
-  ctx.strokeStyle = '#d6e0ee';
-  ctx.lineWidth = 1;
-  for (let level = 1; level <= 5; level++) {
-    const rr = r * level / 5;
-    ctx.beginPath();
-    for (let i=0;i<4;i++) {
-      const angle = -Math.PI/2 + i * (Math.PI*2/4);
-      const x = cx + Math.cos(angle) * rr;
-      const y = cy + Math.sin(angle) * rr;
-      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    if(cmp){
+      setHTML('cmp-status', '<span class="status ok">Synchronisé</span>');
+      setText('cmp-profil', cmp.profil_nom || 'Profil indisponible');
+      setText('cmp-score', `${cmp.score_global}/100`);
+      setText('cmp-summary', cmp.summary || 'Résumé indisponible');
+    } else {
+      setHTML('cmp-status', '<span class="status wait">En attente</span>');
+      setText('cmp-profil', 'Aucun résultat');
+      setText('cmp-score', '—');
+      setText('cmp-summary', 'Le module CMP n’est pas encore synchronisé.');
     }
-    ctx.closePath();
-    ctx.stroke();
-  }
-  for (let i=0;i<4;i++) {
-    const angle = -Math.PI/2 + i * (Math.PI*2/4);
-    const x = cx + Math.cos(angle) * r;
-    const y = cy + Math.sin(angle) * r;
-    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke();
-    const lx = cx + Math.cos(angle) * (r + 28);
-    const ly = cy + Math.sin(angle) * (r + 28);
-    ctx.fillStyle = '#1e3a5f';
-    ctx.font = '600 13px Arial';
-    ctx.textAlign = i === 1 ? 'left' : i === 3 ? 'right' : 'center';
-    ctx.textBaseline = i === 0 ? 'bottom' : i === 2 ? 'top' : 'middle';
-    ctx.fillText(labels[i], lx, ly);
-  }
-  ctx.beginPath();
-  values.forEach((v, i) => {
-    const angle = -Math.PI/2 + i * (Math.PI*2/4);
-    const rr = r * (v/100);
-    const x = cx + Math.cos(angle) * rr;
-    const y = cy + Math.sin(angle) * rr;
-    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-  });
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(59, 102, 194, 0.18)';
-  ctx.strokeStyle = '#294d7a';
-  ctx.lineWidth = 2;
-  ctx.fill();
-  ctx.stroke();
-  values.forEach((v, i) => {
-    const angle = -Math.PI/2 + i * (Math.PI*2/4);
-    const rr = r * (v/100);
-    const x = cx + Math.cos(angle) * rr;
-    const y = cy + Math.sin(angle) * rr;
-    ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fillStyle='#1e3a5f'; ctx.fill();
-  });
-}
 
-function renderOverview() {
-  const data = getHubStore();
-  const score = computeGlobalMentalScore(data);
-  const root = document.getElementById('global-mental-score');
-  if (root) root.textContent = score !== null ? `${score}/100` : '—';
-  const status = document.getElementById('global-status');
-  if (status) {
-    const completed = ['CMP','PMP','EQU'].filter(k => moduleStatus(data, k)).length;
-    status.textContent = `${completed}/3 modules synchronisés`;
+    setText('json-output', JSON.stringify(data, null, 2));
+
+    const cmpOpen = document.getElementById('btn-open-cmp');
+    const cmpRes = document.getElementById('btn-open-cmp-result');
+    if(cmpOpen) cmpOpen.href = cfg.CMP_INDEX_URL;
+    if(cmpRes) cmpRes.href = cfg.CMP_RESULTS_URL;
   }
-  const jsonRoot = document.getElementById('hub-json');
-  if (jsonRoot) jsonRoot.textContent = JSON.stringify(data, null, 2);
-  drawRadar('hub-radar', data);
-}
 
-function renderHub() {
-  renderOverview();
-  renderModuleCard('cmp-card', {
-    key: 'CMP',
-    moduleLabel: 'Module 2',
-    title: 'Compétences Mentales (CMP)',
-    description: 'Questionnaire dynamique, profil automatique, radar et synthèse professionnelle.',
-    emptyText: 'Aucun résultat CMP synchronisé pour le moment.',
-    launchUrl: window.A4P_CONFIG.cmpApp,
-    launchLabel: 'Ouvrir le module CMP',
-    resultsUrl: window.A4P_CONFIG.cmpResults
+  window.addEventListener('storage', render);
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('btn-refresh')?.addEventListener('click', render);
+    document.getElementById('btn-reset')?.addEventListener('click', ()=>{ localStorage.removeItem('a4p_hub_results'); render(); });
+    render();
   });
-  renderModuleCard('pmp-card', {
-    key: 'PMP',
-    moduleLabel: 'Module 1',
-    title: 'Profil Mental (PMP)',
-    description: 'Emplacement stabilisé pour le futur module PMP connecté au hub.',
-    emptyText: 'Le module PMP n’est pas encore connecté.',
-    launchUrl: window.A4P_CONFIG.pmpApp,
-    launchLabel: 'Préparer le module PMP',
-    resultsUrl: ''
-  });
-  renderModuleCard('equ-card', {
-    key: 'EQU',
-    moduleLabel: 'Module 3',
-    title: 'Équilibre Psycho-Émotionnel',
-    description: 'Emplacement stabilisé pour le futur module Équilibre connecté au hub.',
-    emptyText: 'Le module Équilibre n’est pas encore connecté.',
-    launchUrl: window.A4P_CONFIG.psychoApp,
-    launchLabel: 'Préparer le module Équilibre',
-    resultsUrl: ''
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  renderHub();
-  document.getElementById('btn-refresh')?.addEventListener('click', renderHub);
-  document.getElementById('btn-reset')?.addEventListener('click', resetHubStore);
-  window.addEventListener('storage', renderHub);
-});
+})();
