@@ -1,85 +1,176 @@
 (function(){
   const cfg = window.A4P_CONFIG;
 
-  function getData(){
-    try { return JSON.parse(localStorage.getItem('a4p_hub_results')) || {}; }
+  function readHub(){
+    try { return JSON.parse(localStorage.getItem(cfg.storageKey)) || {}; }
     catch(e){ return {}; }
   }
 
-  function setText(id, value){ const el=document.getElementById(id); if(el) el.textContent=value; }
-  function setHTML(id, value){ const el=document.getElementById(id); if(el) el.innerHTML=value; }
+  function setText(id, value){
+    const el = document.getElementById(id);
+    if(el) el.textContent = value;
+  }
 
-  function renderRadar(dimensions){
-    const svg = document.getElementById('radar-svg');
-    if(!svg) return;
+  function setHref(id, href){
+    const el = document.getElementById(id);
+    if(el) el.href = href;
+  }
+
+  function renderModule(blockId, data, opts){
+    const block = document.getElementById(blockId);
+    if(!block) return;
+
+    if(data && data.score_global != null){
+      block.querySelector('.status').className = 'status status-success';
+      block.querySelector('.status').textContent = 'Synchronisé';
+      block.querySelector('.profil').textContent = data.profil_nom || 'Profil disponible';
+      block.querySelector('.score').textContent = `${data.score_global}/100`;
+      block.querySelector('.resume').textContent = data.summary || 'Résultat synchronisé avec le hub.';
+    } else {
+      block.querySelector('.status').className = 'status status-wait';
+      block.querySelector('.status').textContent = 'En attente';
+      block.querySelector('.profil').textContent = 'Aucun résultat';
+      block.querySelector('.score').textContent = '—';
+      block.querySelector('.resume').textContent = opts.emptyText;
+    }
+
+    setHref(opts.testBtnId, opts.testUrl);
+    setHref(opts.resultBtnId, opts.resultUrl);
+  }
+
+  function average(values){
+    const valid = values.filter(v => typeof v === 'number');
+    if(!valid.length) return { value: 0, count: 0 };
+    const total = valid.reduce((a,b)=>a+b,0);
+    return { value: Math.round(total/valid.length), count: valid.length };
+  }
+
+  function drawRadar(dimensions){
+    const canvas = document.getElementById('radarCanvas');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const ratio = window.devicePixelRatio || 1;
+    const cssWidth = Math.min(canvas.parentElement.clientWidth, 560);
+    const cssHeight = cssWidth;
+    canvas.width = cssWidth * ratio;
+    canvas.height = cssHeight * ratio;
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+    ctx.setTransform(ratio,0,0,ratio,0,0);
+    ctx.clearRect(0,0,cssWidth,cssHeight);
+
     const labels = ['Confiance','Régulation','Engagement','Stabilité'];
-    const keys = ['confiance','regulation','engagement','stabilite'];
-    const values = keys.map(k => Number(dimensions?.[k] || 0));
-    const cx=260, cy=260, r=185;
-    const pts = values.map((v,i)=>{
-      const ang = (-90 + i*90) * Math.PI/180;
-      const rr = r*(v/100);
-      return [cx + Math.cos(ang)*rr, cy + Math.sin(ang)*rr];
-    });
-    const polygon = pts.map(p=>p.join(',')).join(' ');
+    const values = [dimensions.confiance||0, dimensions.regulation||0, dimensions.engagement||0, dimensions.stabilite||0];
+    const cx = cssWidth/2, cy = cssHeight/2, radius = cssWidth*0.33;
 
-    let grid='';
-    [20,40,60,80,100].forEach(level=>{
-      const rr=r*(level/100);
-      const levelPts = [0,1,2,3].map(i=>{
-        const ang=(-90+i*90)*Math.PI/180;
-        return [cx+Math.cos(ang)*rr, cy+Math.sin(ang)*rr].join(',');
-      }).join(' ');
-      grid += `<polygon points="${levelPts}" fill="none" stroke="#cfd8e8" stroke-width="2"/>`;
+    ctx.strokeStyle = '#cfd7e6';
+    ctx.lineWidth = 2;
+    for(let level=1; level<=5; level++){
+      const r = radius * (level/5);
+      ctx.beginPath();
+      for(let i=0;i<4;i++){
+        const angle = -Math.PI/2 + i*(Math.PI/2);
+        const x = cx + Math.cos(angle)*r;
+        const y = cy + Math.sin(angle)*r;
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#cfd7e6';
+    for(let i=0;i<4;i++){
+      const angle = -Math.PI/2 + i*(Math.PI/2);
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.lineTo(cx + Math.cos(angle)*radius, cy + Math.sin(angle)*radius);
+      ctx.stroke();
+    }
+
+    ctx.beginPath();
+    values.forEach((v,i)=>{
+      const angle = -Math.PI/2 + i*(Math.PI/2);
+      const r = radius*(Math.max(0,Math.min(100,v))/100);
+      const x = cx + Math.cos(angle)*r;
+      const y = cy + Math.sin(angle)*r;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
     });
-    const axes = [0,1,2,3].map(i=>{
-      const ang=(-90+i*90)*Math.PI/180;
-      return `<line x1="${cx}" y1="${cy}" x2="${cx+Math.cos(ang)*r}" y2="${cy+Math.sin(ang)*r}" stroke="#cfd8e8" stroke-width="2"/>`;
-    }).join('');
-    const labelPts = [0,1,2,3].map(i=>{
-      const ang=(-90+i*90)*Math.PI/180;
-      const lr=r+48;
-      return {x:cx+Math.cos(ang)*lr, y:cy+Math.sin(ang)*lr, t:labels[i]};
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(31,63,119,.16)';
+    ctx.strokeStyle = '#254b8b';
+    ctx.lineWidth = 4;
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#254b8b';
+    values.forEach((v,i)=>{
+      const angle = -Math.PI/2 + i*(Math.PI/2);
+      const r = radius*(Math.max(0,Math.min(100,v))/100);
+      const x = cx + Math.cos(angle)*r;
+      const y = cy + Math.sin(angle)*r;
+      ctx.beginPath();
+      ctx.arc(x,y,6,0,Math.PI*2);
+      ctx.fill();
     });
-    const texts = labelPts.map(l=>`<text x="${l.x}" y="${l.y}" text-anchor="middle" dominant-baseline="middle" font-size="22" font-weight="700" fill="#264879">${l.t}</text>`).join('');
-    const dots = pts.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="7" fill="#264879"/>`).join('');
-    svg.innerHTML = `${grid}${axes}<polygon points="${polygon}" fill="rgba(38,72,121,.18)" stroke="#264879" stroke-width="5"/>${dots}${texts}`;
+
+    ctx.fillStyle = '#24406f';
+    ctx.font = '700 18px -apple-system, BlinkMacSystemFont, Segoe UI, Arial';
+    labels.forEach((label,i)=>{
+      const angle = -Math.PI/2 + i*(Math.PI/2);
+      const x = cx + Math.cos(angle)*(radius+44);
+      const y = cy + Math.sin(angle)*(radius+44);
+      const width = ctx.measureText(label).width;
+      ctx.fillText(label, x - width/2, y + 6);
+    });
   }
 
   function render(){
-    const data = getData();
-    const cmp = data.CMP;
-    const syncedCount = [data.PMP, data.CMP, data.EQU].filter(Boolean).length;
-    const global = cmp?.score_global || 0;
-    setText('score-global', `${global}/100`);
-    setText('synced-count', `${syncedCount}/3 modules synchronisés`);
+    const data = readHub();
+    const cmp = data.CMP || null;
+    const pmp = data.PMP || null;
+    const equ = data.EQU || data.PSYCHO || null;
 
-    renderRadar(cmp?.dimensions || {});
+    renderModule('module-cmp', cmp, {
+      testBtnId:'btn-cmp-test', resultBtnId:'btn-cmp-result',
+      testUrl:cfg.cmpTestUrl, resultUrl:cfg.cmpResultsUrl,
+      emptyText:'Le module CMP n’est pas encore synchronisé avec le hub.'
+    });
 
-    if(cmp){
-      setHTML('cmp-status', '<span class="status ok">Synchronisé</span>');
-      setText('cmp-profil', cmp.profil_nom || 'Profil indisponible');
-      setText('cmp-score', `${cmp.score_global}/100`);
-      setText('cmp-summary', cmp.summary || 'Résumé indisponible');
-    } else {
-      setHTML('cmp-status', '<span class="status wait">En attente</span>');
-      setText('cmp-profil', 'Aucun résultat');
-      setText('cmp-score', '—');
-      setText('cmp-summary', 'Le module CMP n’est pas encore synchronisé.');
-    }
+    renderModule('module-pmp', pmp, {
+      testBtnId:'btn-pmp-test', resultBtnId:'btn-pmp-result',
+      testUrl:cfg.pmpTestUrl, resultUrl:cfg.pmpResultsUrl,
+      emptyText:'Le module PMP a été remis sur sa passerelle locale pour éviter toute régression de lien.'
+    });
 
-    setText('json-output', JSON.stringify(data, null, 2));
+    renderModule('module-equ', equ, {
+      testBtnId:'btn-equ-test', resultBtnId:'btn-equ-result',
+      testUrl:cfg.equilibreTestUrl, resultUrl:cfg.equilibreResultsUrl,
+      emptyText:'Le module Équilibre n’est pas encore connecté.'
+    });
 
-    const cmpOpen = document.getElementById('btn-open-cmp');
-    const cmpRes = document.getElementById('btn-open-cmp-result');
-    if(cmpOpen) cmpOpen.href = cfg.CMP_INDEX_URL;
-    if(cmpRes) cmpRes.href = cfg.CMP_RESULTS_URL;
+    const avg = average([
+      cmp?.score_global,
+      pmp?.score_global,
+      equ?.score_global
+    ]);
+    setText('global-score', `${avg.value}/100`);
+    setText('global-count', `${avg.count}/3 modules synchronisés`);
+
+    const dims = cmp?.dimensions || {confiance:0, regulation:0, engagement:0, stabilite:0};
+    drawRadar(dims);
+
+    const tech = document.getElementById('shared-json');
+    if(tech) tech.textContent = JSON.stringify(data, null, 2);
   }
 
+  window.addEventListener('resize', render);
   window.addEventListener('storage', render);
-  document.addEventListener('DOMContentLoaded', ()=>{
+  document.addEventListener('DOMContentLoaded', function(){
     document.getElementById('btn-refresh')?.addEventListener('click', render);
-    document.getElementById('btn-reset')?.addEventListener('click', ()=>{ localStorage.removeItem('a4p_hub_results'); render(); });
+    document.getElementById('btn-reset')?.addEventListener('click', function(){
+      localStorage.removeItem(cfg.storageKey);
+      render();
+    });
     render();
   });
 })();
